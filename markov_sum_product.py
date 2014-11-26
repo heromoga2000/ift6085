@@ -63,17 +63,29 @@ q = 0.7
 visible_to_hidden_prob = np.array([[q, 1. - q],
                                    [1. - q, q]])
 
+# Hardcoded in the function but will list it here as well
 # x1
 # Bad | Good
 init_prob = np.array([[0.8, 0.2],])
-
 
 # X is observed, Z is hidden state
 X = loadmat('sp500.mat')['price_move']
 X[ X > 0] = 1
 X[ X < 0] = 0
 
-#p, f, b = fb_alg(transition_prob, visible_to_hidden_prob, X.ravel())
-#print(p)
-p, f, b = belief_propagation(transition_prob, visible_to_hidden_prob, X.ravel())
-print(p)
+pl, f, b = belief_propagation(transition_prob, visible_to_hidden_prob, X.ravel())
+
+# xt, zt
+# -1, Bad  | +1, Bad
+# -1, Good | +1, Good
+q = 0.9
+visible_to_hidden_prob = np.array([[q, 1. - q],
+                                   [1. - q, q]])
+ph, f, b = belief_propagation(transition_prob, visible_to_hidden_prob, X.ravel())
+plt.plot(pl[:, 1], label="q=0.7", color="steelblue")
+plt.plot(ph[:, 1], label="q=0.9", color="darkred")
+plt.title("Discrete HMM Belief Propagation")
+plt.xlabel("Time (Weeks)")
+plt.ylabel("Marginal probability of 'good' state")
+plt.legend()
+plt.show()
